@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import style from '../Login/login.module.css';
 import { Button } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
@@ -5,6 +6,10 @@ import { Link } from 'react-router-dom';
 
 
 const Login = () => {
+    useEffect(() => {
+        document.title = "Student Sign In";
+    }, []);
+
     const studentLogin = (e) => {
         e.preventDefault();
         alert('login');
@@ -17,13 +22,13 @@ const Login = () => {
                 <div>
                     <label htmlFor="username">Username</label>
                     <br />
-                    <Form.Control type="text" placeholder="Username" />
+                    <Form.Control type="text" placeholder="Username" className={style.input} />
                 </div>
                 <br />
                 <div>
                     <label htmlFor="password">Password</label>
                     <br />
-                    <Form.Control type="password" placeholder="Password" />
+                    <Form.Control type="password" placeholder="Password" className={style.input} />
                 </div>
                 <br />
                 <div className={style.button}>

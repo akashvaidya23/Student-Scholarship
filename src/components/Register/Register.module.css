@@ -21,3 +21,9 @@
     width: 100%;
     text-align: center;
 }
+
+.input{
+    border-color: black;
+    border-radius: 8px;
+    width: 100%;
+}
