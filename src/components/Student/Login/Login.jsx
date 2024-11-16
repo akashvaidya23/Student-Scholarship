@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import style from "../Login/login.module.css";
+import style from "./login.module.css";
 import { Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { Link } from "react-router-dom";

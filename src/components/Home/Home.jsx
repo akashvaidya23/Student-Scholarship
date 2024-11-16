@@ -10,7 +10,9 @@ const Home = () => {
         <Button as={Link} to={"student/login"} variant="secondary">
           Student
         </Button>
-        <Button variant="primary">Teacher</Button>
+        <Button as={Link} to={"teacher/login"} variant="primary">
+          Teacher
+        </Button>
         <Button variant="success">Admin</Button>
       </div>
     </>

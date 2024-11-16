@@ -1,29 +1,29 @@
 import { Button } from "react-bootstrap";
-import style from "../Register/Register.module.css";
+import style from "./TeacherRegister.module.css";
 import Form from "react-bootstrap/Form";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
-const Register = () => {
+const TeacherRegister = () => {
   useEffect(() => {
-    document.title = "Student Create Account";
+    document.title = "Teacher Create Account";
   }, []);
 
-  const studentRegister = (e) => {
+  const TeacherRegister = (e) => {
     e.preventDefault();
     alert("Register");
   };
 
   return (
     <div className={style.main}>
-      <h3>Student Sign Up</h3>
-      <form id="studentRegister" onSubmit={studentRegister}>
+      <h3>Teacher Sign Up</h3>
+      <form id="TeacherRegister" onSubmit={TeacherRegister}>
         <div>
           <label htmlFor="name">Name</label>
           <br />
           <Form.Control
             type="text"
-            placeholder="Name of the Student"
+            placeholder="Name of the Teacher"
             name="name"
             id="name"
             className={style.input}
@@ -35,7 +35,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Email ID of the Student"
+            placeholder="Email ID of the Teacher"
             name="email"
             id="email"
             className={style.input}
@@ -47,7 +47,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Mobile No of the Student"
+            placeholder="Mobile No of the Teacher"
             name="mobile"
             id="mobile"
             className={style.input}
@@ -59,7 +59,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Username of the Student"
+            placeholder="Username of the Teacher"
             name="username"
             id="username"
             className={style.input}
@@ -97,7 +97,7 @@ const Register = () => {
         </div>
         <p className={style.para}>
           Already have an account{" "}
-          <Link className={style.link} to={`/student/login`}>
+          <Link className={style.link} to={`/teacher/login`}>
             Login
           </Link>
         </p>
@@ -106,4 +106,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default TeacherRegister;
