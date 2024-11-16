@@ -1,0 +1,14 @@
+.home {
+  margin: 20px;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.heading {
+  margin: 20px;
+  text-align: center;
+}
