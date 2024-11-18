@@ -11,6 +11,7 @@ import TeacherLogin from "./components/Teacher/Login/TeacherLogin.jsx";
 import Register from "./components/Student/Register/Register.jsx";
 import Home from "./components/Home/Home.jsx";
 import TeacherRegister from "./components/Teacher/Register/TeacherRegister.jsx";
+import AdminLogin from "./components/Admin/Login/AdminLogin.jsx";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
         path: "teacher/register",
         element: <TeacherRegister />,
       },
+      {
+        path: "admin/login",
+        element: <AdminLogin/>
+      }
     ],
   },
 ]);

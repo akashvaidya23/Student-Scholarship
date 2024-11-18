@@ -7,13 +7,13 @@ const Home = () => {
     <>
       <h4 className={style.heading}>I AM A</h4>
       <div className={style.home}>
-        <Button as={Link} to={"student/login"} variant="secondary">
+        <Button as={Link} to={"student/login"} variant="outline-primary">
           Student
         </Button>
-        <Button as={Link} to={"teacher/login"} variant="primary">
+        <Button as={Link} to={"teacher/login"} variant="outline-primary">
           Teacher
         </Button>
-        <Button variant="success">Admin</Button>
+        <Button as={Link} to={"admin/login"} variant="outline-primary">Admin</Button>
       </div>
     </>
   );
