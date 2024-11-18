@@ -1,14 +1,22 @@
 .home {
-  margin: 20px;
+  margin: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column; /* Arrange children vertically (heading + button row) */
   text-align: center;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+  align-items: center; /* Center elements horizontally */
+  justify-content: center; /* Center elements vertically */
+  gap: 20px; /* Spacing between the heading and the button row */
+  position: absolute; /* Positions the container relative to the viewport */
+  top: 50%; /* Moves the container to the vertical center */
+  left: 50%; /* Moves the container to the horizontal center */
+  transform: translate(-50%, -50%); /* Centers the container perfectly */
+  border: 2px solid #007bff; /* Adds a border */
+  padding: 20px; /* Adds padding inside the border */
+  border-radius: 10px; /* Optional: Adds rounded corners */
 }
 
-.heading {
-  margin: 20px;
-  text-align: center;
+.buttonRow {
+  display: flex; /* Arrange buttons horizontally */
+  flex-direction: row; /* Ensure buttons are in a single row */
+  gap: 20px; /* Spacing between buttons */
 }
