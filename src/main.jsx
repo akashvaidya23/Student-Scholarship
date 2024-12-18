@@ -1,7 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Navigation from "./components/Navigation/Navigation.jsx";
@@ -12,6 +10,9 @@ import Register from "./components/Student/Register/Register.jsx";
 import Home from "./components/Home/Home.jsx";
 import TeacherRegister from "./components/Teacher/Register/TeacherRegister.jsx";
 import AdminLogin from "./components/Admin/Login/AdminLogin.jsx";
+import Dashboard from "./components/Dashboard/Dashboard.jsx";
+import CheckIfAuth from "./components/CheckIsAuth.jsx";
+import "./App.css";
 
 const router = createBrowserRouter([
   {
@@ -41,8 +42,16 @@ const router = createBrowserRouter([
       },
       {
         path: "admin/login",
-        element: <AdminLogin/>
-      }
+        element: <AdminLogin />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <CheckIfAuth>
+            <Dashboard />
+          </CheckIfAuth>
+        ),
+      },
     ],
   },
 ]);

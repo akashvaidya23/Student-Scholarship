@@ -1,12 +1,18 @@
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { checkIfLoggedIn, logout } from "../../services/auth";
 
 function Navigation() {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const user = checkIfLoggedIn();
+
   return (
     <>
       <Navbar expand="lg" className="bg-primary text-white">
@@ -27,6 +33,15 @@ function Navigation() {
               <Nav.Link as={Link} href="/" className="text-white">
                 Link
               </Nav.Link>
+              {user && (
+                <Nav.Link
+                  as={Link}
+                  className="text-white"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Nav.Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

@@ -1,22 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import style from "./TeacherLogin.module.css";
 import { Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../../../services/auth";
 
 const TeacherLogin = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+
   useEffect(() => {
     document.title = "Teacher Sign In";
   }, []);
 
-  const studentLogin = (e) => {
+  const usernameRef = useRef();
+  const passwordRef = useRef();
+
+  const studentLogin = async (e) => {
     e.preventDefault();
-    alert("login");
+    setError("");
+    const payload = {
+      username: usernameRef.current.value,
+      password: passwordRef.current.value,
+      role: "teacher",
+    };
+    const response = await login(payload);
+    console.log(response);
+
+    if (response.status == false) {
+      setError(response.message);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
     <div className={style.main}>
       <h3>Teacher Log In</h3>
+      {error ? <p className="error">{error}</p> : ""}
       <form id="studentLogin" onSubmit={studentLogin}>
         <div>
           <label htmlFor="username">Username</label>
@@ -25,6 +46,7 @@ const TeacherLogin = () => {
             type="text"
             placeholder="Username"
             className={style.input}
+            ref={usernameRef}
           />
         </div>
         <br />
@@ -35,6 +57,7 @@ const TeacherLogin = () => {
             type="password"
             placeholder="Password"
             className={style.input}
+            ref={passwordRef}
           />
         </div>
         <br />
