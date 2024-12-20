@@ -1,11 +1,13 @@
 import { Button } from "react-bootstrap";
-import style from "./Register.module.css";
+import style from "./register.module.css";
 import Form from "react-bootstrap/Form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { registerUser } from "../../../services/auth.js";
+import { registerUser } from "../../services/auth.js";
 
 const Register = () => {
+  const [params] = useSearchParams();
+  const role = params.get("role");
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -44,7 +46,7 @@ const Register = () => {
       mobile_no: mobileNoRef.current.value,
       username: userNameRef.current.value,
       password: passwordRef.current.value,
-      role: "student",
+      role,
     };
     const response = await registerUser(updatedPayload);
     if (response.status == false) {
@@ -63,7 +65,7 @@ const Register = () => {
 
   return (
     <div className={style.main}>
-      <h3>Student Sign Up</h3>
+      <h3>{role.charAt(0).toUpperCase() + role.slice(1)} Sign Up</h3>
       {error ? <p className="error">{error}</p> : ""}
       <form id="studentRegister" onSubmit={studentRegister}>
         <div>
@@ -168,7 +170,7 @@ const Register = () => {
         </div>
         <p className={style.para}>
           Already have an account{" "}
-          <Link className={style.link} to={`/student/login`}>
+          <Link className={style.link} to={`/login/?role=${role}`}>
             Login
           </Link>
         </p>

@@ -8,13 +8,21 @@ const Home = () => {
       <div className={style.home}>
         <h4 className={style.heading}>I AM A</h4>
         <div className={style.buttonRow}>
-          <Button as={Link} to={"student/login"} variant="outline-primary">
+          <Button
+            as={Link}
+            to={"/login/?role=student"}
+            variant="outline-primary"
+          >
             Student
           </Button>
-          <Button as={Link} to={"teacher/login"} variant="outline-primary">
+          <Button
+            as={Link}
+            to={"/login/?role=teacher"}
+            variant="outline-primary"
+          >
             Teacher
           </Button>
-          <Button as={Link} to={"admin/login"} variant="outline-primary">
+          <Button as={Link} to={"/login/?role=admin"} variant="outline-primary">
             Admin
           </Button>
         </div>

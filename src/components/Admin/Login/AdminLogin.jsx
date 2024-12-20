@@ -5,6 +5,10 @@ import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../../services/auth";
 
+/**
+ * AdminLogin component
+ * @returns {JSX.Element} Form for admin to log in
+ */
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");

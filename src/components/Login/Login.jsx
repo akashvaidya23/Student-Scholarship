@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import style from "./login.module.css";
 import { Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../../services/auth";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { login } from "../../services/auth";
 
 const Login = () => {
+  const [params] = useSearchParams();
+  const role = params.get("role");
+
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -22,7 +25,7 @@ const Login = () => {
     const payload = {
       username: usernameRef.current.value,
       password: passwordRef.current.value,
-      role: "student",
+      role,
     };
     const response = await login(payload);
     console.log(response);
@@ -36,7 +39,7 @@ const Login = () => {
 
   return (
     <div className={style.main}>
-      <h3>Student Log In</h3>
+      <h3>{role.charAt(0).toUpperCase() + role.slice(1)} Log In</h3>
       {error ? <p className="error">{error}</p> : ""}
       <form id="studentLogin" onSubmit={studentLogin}>
         <div>
@@ -69,7 +72,7 @@ const Login = () => {
         <br />
         <p className={style.para}>
           New to this site{" "}
-          <Link className={style.link} to={`/student/register`}>
+          <Link className={style.link} to={`/register/?role=${role}`}>
             Register
           </Link>
         </p>
