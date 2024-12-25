@@ -37,6 +37,12 @@ function Navigation() {
     getUser();
   }, []);
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Retrieves the user details from the server based on the user ID stored in
+   * localStorage and stores it in the component state.
+   */
+  /******  58b3b8e0-dc50-4924-bd04-393b06da769e  *******/
   const getUser = async () => {
     try {
       const userID = checkIfLoggedIn();

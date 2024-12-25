@@ -192,24 +192,58 @@ const Profile = () => {
     }
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Removes the achievement at the specified index from the list of achievements.
+   * @param {number} index The index of the achievement to remove
+   */
+
+  /******  7049e9ef-586d-4999-a560-7a595b358a38  *******/
   const removeAchievement = (index) => {
     const achs = [...achievements];
     achs.splice(index, 1);
     setAchievements(achs);
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Removes the skill at the given index from the list of skills.
+   * @param {number} index The index of the skill to remove
+   */
+  /******  c16e33bc-420b-4392-a1ae-012a888dba66  *******/
   const removeSkill = (index) => {
     const skils = [...skills];
     skils.splice(index, 1);
     setSkills(skils);
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Removes the interest at the given index from the list of interests.
+   * @param {number} index The index of the interest to remove
+   * @return {void}
+   */
+  /******  319ba2fa-647a-41ce-b4fe-cf86805dbf1c  *******/
   const removeInterest = (index) => {
     const interestss = [...interests];
     interestss.splice(index, 1);
     setInterests(interestss);
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Updates the user's profile with the provided details.
+   *
+   * This function validates the mobile number, Aadhaar number, and PAN number
+   * before updating the user's profile. If any validation fails, an error
+   * message is set and the function returns false. If all validations pass,
+   * the user's profile is updated with the new details and the user is
+   * navigated to the dashboard.
+   *
+   * @param {Object} e - The event object from the form submission.
+   */
+
+  /******  c4c96177-8eb1-4c36-bd46-7c4d94fb57f4  *******/
   const updateProfile = async (e) => {
     e.preventDefault();
     setMobileError("");
