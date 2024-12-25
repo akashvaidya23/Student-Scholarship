@@ -2,7 +2,8 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { checkIfLoggedIn, logout } from "../../services/auth";
+import { checkIfLoggedIn, getUserDetails, logout } from "../../services/auth";
+import { useEffect, useState } from "react";
 
 /**
  * The Navigation component renders the navigation bar at the top of every
@@ -30,8 +31,25 @@ function Navigation() {
     navigate("/");
   };
 
-  const user = checkIfLoggedIn();
+  const [user, setUser] = useState();
 
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    try {
+      const userID = checkIfLoggedIn();
+      const user = await getUserDetails(userID);
+      /*
+        console.log(user.data[0]);
+      */
+      setUser(user.data[0]);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  // console.log(user);
   return (
     <>
       <Navbar expand="lg" className="bg-primary text-white">
@@ -47,14 +65,31 @@ function Navigation() {
               navbarScroll
             >
               {user && user.role === "admin" && (
-                <Nav.Link as={Link} to="/" className="text-white">
+                <Nav.Link as={Link} to="/teachers" className="text-white">
                   Teachers
                 </Nav.Link>
               )}
 
               {user && ["admin", "teacher"].includes(user.role) && (
-                <Nav.Link as={Link} to="/" className="text-white">
+                <Nav.Link as={Link} to="/students" className="text-white">
                   Students
+                </Nav.Link>
+              )}
+
+              {user && user.role == "admin" && (
+                <Nav.Link as={Link} to="/verify" className="text-white">
+                  Verify Details
+                </Nav.Link>
+              )}
+
+              {user && user.role == "student" && (
+                <Nav.Link as={Link} to="/profile" className="text-white">
+                  Profile
+                </Nav.Link>
+              )}
+              {user && user.role == "admin" && (
+                <Nav.Link as={Link} to="/departments" className="text-white">
+                  Departments
                 </Nav.Link>
               )}
               {user && (

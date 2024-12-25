@@ -27,7 +27,7 @@ const login = async (payload) => {
     if (login.data.status == false) {
       return login.data;
     } else {
-      localStorage.setItem("token", JSON.stringify(login.data.user));
+      localStorage.setItem("token", JSON.stringify(login.data.user.id));
       return { status: true, user: login.data.user };
     }
   } catch (error) {
@@ -62,7 +62,7 @@ const login = async (payload) => {
  * @param {string} payload.role
  * @returns {Promise<Object>}
  */
-const registerUser = async (payload) => {
+const registerUser = async (payload, is_login) => {
   try {
     const response = await axios({
       method: "post",
@@ -72,9 +72,11 @@ const registerUser = async (payload) => {
 
     if (response.data.status == false) {
       return response.data;
-    } else {
-      localStorage.setItem("token", JSON.stringify(response.data.user));
+    } else if (is_login) {
+      localStorage.setItem("token", JSON.stringify(response.data.user.id));
       return { status: true, user: response.data.user };
+    } else {
+      return { status: true };
     }
   } catch (error) {
     if (error.code === "ERR_NETWORK") {
@@ -155,4 +157,42 @@ const createAdmin = async () => {
   }
 };
 
-export { login, registerUser, logout, checkIfLoggedIn, createAdmin };
+const deleteUser = async (id) => {
+  try {
+    const result = await axios.delete(`${localBaseUrl}api/users/${id}`);
+    console.log("result ", result);
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const getUserDetails = async (id) => {
+  try {
+    const user = await axios.get(`${localBaseUrl}api/users/${id}`);
+    console.log(user);
+    return user;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const updateUser = async (id, payload) => {
+  try {
+    const result = await axios.put(`${localBaseUrl}api/users/${id}`, payload);
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export {
+  login,
+  registerUser,
+  logout,
+  checkIfLoggedIn,
+  createAdmin,
+  deleteUser,
+  getUserDetails,
+  updateUser,
+};

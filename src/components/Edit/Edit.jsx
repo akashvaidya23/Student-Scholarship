@@ -1,12 +1,14 @@
 import { Button } from "react-bootstrap";
-import style from "./register.module.css";
+import style from "./Edit.module.css";
 import Form from "react-bootstrap/Form";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { registerUser } from "../../services/auth.js";
 
-const Register = () => {
+const Edit = () => {
   const [params] = useSearchParams();
+  console.log("params ", params);
+
   const role = params.get("role");
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -14,7 +16,7 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
-    document.title = "Student Create Account";
+    document.title = "Create Account";
   }, []);
 
   const nameRef = useRef();
@@ -48,7 +50,7 @@ const Register = () => {
       password: passwordRef.current.value,
       role,
     };
-    const response = await registerUser(updatedPayload);
+    const response = await registerUser(updatedPayload, false);
     if (response.status == false) {
       setError(response.message);
       return false;
@@ -59,13 +61,13 @@ const Register = () => {
       userNameRef.current.value = null;
       passwordRef.current.value = null;
       confirmPasswordRef.current.value = null;
-      navigate("/dashboard");
+      role == "student" ? navigate("/students") : navigate("/teachers");
     }
   };
 
   return (
     <div className={style.main}>
-      <h3>{role.charAt(0).toUpperCase() + role.slice(1)} Sign Up</h3>
+      <h3>Create {role.charAt(0).toUpperCase() + role.slice(1)}</h3>
       {error ? <p className="error">{error}</p> : ""}
       <form id="studentRegister" onSubmit={studentRegister}>
         <div>
@@ -73,7 +75,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Name"
+            placeholder="Name of the Student"
             name="name"
             id="name"
             className={style.input}
@@ -88,7 +90,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Email ID"
+            placeholder="Email ID of the Student"
             name="email"
             id="email"
             className={style.input}
@@ -103,7 +105,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="number"
-            placeholder="Mobile No"
+            placeholder="Mobile No of the Student"
             name="mobile"
             id="mobile"
             className={style.input}
@@ -122,7 +124,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="text"
-            placeholder="Username"
+            placeholder="Username of the Student"
             name="username"
             id="username"
             className={style.input}
@@ -137,7 +139,7 @@ const Register = () => {
           <br />
           <Form.Control
             type="password"
-            placeholder="Password"
+            placeholder="Enter Password"
             name="password"
             id="password"
             className={style.input}
@@ -165,18 +167,12 @@ const Register = () => {
         <br />
         <div className={style.button}>
           <Button type="submit" varient="primary">
-            Register
+            Update
           </Button>
         </div>
-        <p className={style.para}>
-          Already have an account{" "}
-          <Link className={style.link} to={`/login/?role=${role}`}>
-            Login
-          </Link>
-        </p>
       </form>
     </div>
   );
 };
 
-export default Register;
+export default Edit;

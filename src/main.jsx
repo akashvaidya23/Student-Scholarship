@@ -7,10 +7,15 @@ import ErrorPage from "./components/Error-page/ErrorPage.jsx";
 import Login from "./components/Login/Login.jsx";
 import Register from "./components/Register/Register.jsx";
 import Home from "./components/Home/Home.jsx";
-import AdminLogin from "./components/Admin/Login/AdminLogin.jsx";
 import Dashboard from "./components/Dashboard/Dashboard.jsx";
 import CheckIfAuth from "./components/CheckIsAuth.jsx";
 import "./App.css";
+import List from "./components/List/List.jsx";
+import Create from "./components/Create/Create.jsx";
+import Edit from "./components/Edit/Edit.jsx";
+import Verify from "./components/Verify/Verify.jsx";
+import Profile from "./components/Profile/Profile.jsx";
+import Departments from "./components/Departments/Departments.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,8 +36,36 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
-        path: "admin/login",
-        element: <AdminLogin />,
+        path: "create",
+        element: <Create />,
+      },
+      {
+        path: "/students",
+        element: (
+          <CheckIfAuth>
+            <List type="student" />
+          </CheckIfAuth>
+        ),
+        children: [
+          {
+            path: "edit/:id",
+            element: <Edit />,
+          },
+        ],
+      },
+      {
+        path: "/teachers",
+        element: (
+          <CheckIfAuth>
+            <List type="teacher" />
+          </CheckIfAuth>
+        ),
+        children: [
+          {
+            path: "edit/:id",
+            element: <Edit />,
+          },
+        ],
       },
       {
         path: "/dashboard",
@@ -41,6 +74,22 @@ const router = createBrowserRouter([
             <Dashboard />
           </CheckIfAuth>
         ),
+      },
+      {
+        path: "/verify",
+        element: (
+          <CheckIfAuth>
+            <Verify />
+          </CheckIfAuth>
+        ),
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
+        path: "/departments",
+        element: <Departments />,
       },
     ],
   },
