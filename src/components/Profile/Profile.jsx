@@ -446,6 +446,7 @@ const Profile = () => {
                     size={12}
                     maxLength={12}
                   />
+                  {aadharError && <span className="error">{aadharError}</span>}
                 </div>
               </Col>
               <Col>
@@ -466,6 +467,7 @@ const Profile = () => {
                     size={10}
                     maxLength={10}
                   />
+                  {panError && <span className="error">{panError}</span>}
                 </div>
               </Col>
             </Row>
