@@ -167,19 +167,47 @@ const deleteUser = async (id) => {
   }
 };
 
+/**
+ * Retrieves the details of a user by their ID.
+ *
+ * @param {string} id The ID of the user to retrieve.
+ * @returns {Promise<Object>} A response object with a status and a user object
+ *   if the request is successful, or an error message if the request is
+ *   unsuccessful.
+ */
 const getUserDetails = async (id) => {
   try {
     const user = await axios.get(`${localBaseUrl}api/users/${id}`);
-    console.log(user);
     return user;
   } catch (err) {
     console.log(err);
   }
 };
 
+/**
+ * Updates a user in the database with the given information.
+ *
+ * This function updates a user in the database with the given
+ * information. It returns a response object with a status and a user
+ * object if the request is successful, or an error message if the
+ * request is unsuccessful.
+ *
+ * @param {string} id The id of the user to be updated.
+ * @param {Object} payload The information to update the user with.
+ *   The object should contain the following properties:
+ *   - name: The name of the user.
+ *   - email: The email of the user.
+ *   - mobileNo: The mobile number of the user.
+ *   - userName: The username of the user.
+ *   - role: The role of the user.
+ *   - password: The password of the user.
+ * @returns {Promise<Object>} A response object with a status and a user
+ *   object if the request is successful, or an error message if the
+ *   request is unsuccessful.
+ */
 const updateUser = async (id, payload) => {
   try {
-    const result = await axios.put(`${localBaseUrl}api/users/${id}`, payload);
+    const result = await axios.patch(`${localBaseUrl}api/users/${id}`, payload);
     return result;
   } catch (err) {
     console.log(err);
