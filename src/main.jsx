@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -16,6 +16,8 @@ import Edit from "./components/Edit/Edit.jsx";
 import Verify from "./components/Verify/Verify.jsx";
 import Profile from "./components/Profile/Profile.jsx";
 import Departments from "./components/Departments/Departments.jsx";
+import { Provider } from "react-redux";
+import { store } from "./app/store.js";
 
 const router = createBrowserRouter([
   {
@@ -96,7 +98,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  <Provider store={store}>
     <RouterProvider router={router} />
-  </StrictMode>
+  </Provider>
 );

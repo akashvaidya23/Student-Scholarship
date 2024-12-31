@@ -4,12 +4,15 @@ import { Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../../services/auth";
+import { useDispatch } from "react-redux";
+import { userLogin } from "../../features/user/userSlice";
 
 const Login = () => {
   const [params] = useSearchParams();
   const role = params.get("role");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -35,6 +38,7 @@ const Login = () => {
     } else {
       navigate("/dashboard");
     }
+    dispatch(userLogin(response.user));
   };
 
   return (

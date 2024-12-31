@@ -2,30 +2,30 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { checkIfLoggedIn, getUserDetails, logout } from "../../services/auth";
+import { getUserDetails, logout } from "../../services/auth";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { userLogout } from "../../features/user/userSlice";
 
 function Navigation() {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleLogout = () => {
     logout();
+    dispatch(userLogout());
     navigate("/");
   };
-
   const [user, setUser] = useState();
+  const currentUser = useSelector((state) => state.user);
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [currentUser]);
 
   const getUser = async () => {
     try {
-      const userID = checkIfLoggedIn();
-      console.log("User ID: ", userID);
-      if (userID) {
-        const user = await getUserDetails(userID);
-        console.log("User Details: ", user);
+      if (currentUser.user != null) {
+        const user = await getUserDetails(currentUser.user);
         setUser(user.data[0]);
       } else {
         setUser(null);
@@ -34,7 +34,6 @@ function Navigation() {
       console.log(err);
     }
   };
-  console.log("user ", user);
   return (
     <>
       <Navbar expand="lg" className="bg-primary text-white">
