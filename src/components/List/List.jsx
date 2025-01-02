@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import {
   Button,
-  FormControl,
   Table,
   Modal,
   Form,
@@ -12,10 +11,15 @@ import {
 import style from "./List.module.css";
 import { getUsers } from "../../services/roles";
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { deleteUser } from "../../services/auth";
+import { useSearchParams } from "react-router-dom";
+import { deleteUser, registerUser, updateUser } from "../../services/auth";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 const List = ({ type }) => {
+  const notify = (message) => {
+    return toast(message);
+  };
+  const [toastColor, setToastColor] = useState("");
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -32,16 +36,20 @@ const List = ({ type }) => {
     achievements: [],
     skills: [],
     interests: [],
+    caste: "",
+    category: "",
+    gender: "",
+    specially_abled: "",
+    family_income: "",
   });
   const [params] = useSearchParams();
   const [error, setError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [panError, setPanError] = useState("");
   const [aadharError, setAadharError] = useState("");
+  const [action, setAction] = useState("");
 
   const achievementsRef = useRef();
-  const skillsRef = useRef();
-  const interestRef = useRef();
 
   useEffect(() => {
     handleFetchUsers();
@@ -50,6 +58,7 @@ const List = ({ type }) => {
   useEffect(() => {
     if (selectedUser) {
       setUserDetails({
+        id: selectedUser.id || "",
         name: selectedUser.name || "",
         mobileNo: selectedUser.mobile_no || "",
         email: selectedUser.email || "",
@@ -62,10 +71,11 @@ const List = ({ type }) => {
         achievements: selectedUser.achievements
           ? selectedUser.achievements.split(",")
           : [],
-        skills: selectedUser.skills ? selectedUser.skills.split(",") : [],
-        interests: selectedUser.interests
-          ? selectedUser.interests.split(",")
-          : [],
+        caste: selectedUser.caste || "",
+        category: selectedUser.category || "",
+        gender: selectedUser.gender || "",
+        specially_abled: selectedUser.specially_abled || "",
+        family_income: selectedUser.family_income || "",
       });
     }
   }, [selectedUser]);
@@ -124,16 +134,38 @@ const List = ({ type }) => {
   };
 
   const handleDelete = async (user) => {
+    // setToastColor("red");
     const result = await deleteUser(user.id);
     if (result.data.status === true) {
-      alert("User deleted successfully");
       handleFetchUsers();
+      toast.danger("User deleted successfully.", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     } else {
-      alert("Something went wrong");
+      toast.danger("Something went wrong.", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
 
-  const handleEdit = (user) => {
+  const handleEdit = (action, user) => {
+    setAction(action);
     setSelectedUser(user);
     setShowModal(true);
   };
@@ -177,19 +209,36 @@ const List = ({ type }) => {
       aadhar: userDetails.aadhaar,
       pan: userDetails.pan,
       achievements: userDetails.achievements.join(","),
-      skills: userDetails.skills.join(","),
-      interests: userDetails.interests.join(","),
+      role: type,
     };
-
+    console.log(userDetails.id);
+    // return false;
     try {
-      const response = await updateUser(userDetails.id, updatedPayload);
+      let response = null;
+      if (!userDetails.id) {
+        response = await registerUser(updatedPayload);
+      } else {
+        response = await updateUser(userDetails.id, updatedPayload);
+      }
       if (response.status === false) {
         setError(response.message);
       } else {
-        alert("Profile updated successfully");
+        toast.success(`User ${action}ed successfully`, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
         setShowModal(false);
+        handleFetchUsers();
       }
     } catch (error) {
+      console.log(error);
       setError(
         "An error occurred while updating the profile. Please try again."
       );
@@ -211,13 +260,9 @@ const List = ({ type }) => {
             marginBottom: "10px",
           }}
         >
-          <FormControl
-            placeholder="Type to Search..."
-            style={{ width: "300px", border: "1px solid black" }}
-          ></FormControl>
-          <Link to={`/create/?role=${type}`}>
-            <Button variant="success">Add</Button>
-          </Link>
+          <Button onClick={() => handleEdit("Add", {})} variant="success">
+            Add
+          </Button>
         </div>
         <br />
         <Table>
@@ -247,7 +292,10 @@ const List = ({ type }) => {
                       textAlign: "center",
                     }}
                   >
-                    <Button variant="primary" onClick={() => handleEdit(user)}>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleEdit("Edit", user)}
+                    >
                       Edit
                     </Button>
                     <Button variant="danger" onClick={() => handleDelete(user)}>
@@ -269,7 +317,7 @@ const List = ({ type }) => {
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            Edit {type.charAt(0).toUpperCase() + type.slice(1)}
+            {action} {type.charAt(0).toUpperCase() + type.slice(1)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -352,217 +400,324 @@ const List = ({ type }) => {
                       />
                     </div>
                   </Col>
-                  <Col>
-                    <div>
-                      <label htmlFor="department">Department</label>
-                      <br />
-                      <Form.Select
-                        aria-label="Select Department"
-                        className={style.input}
-                        name="department"
-                        value={userDetails.department}
-                        onChange={handleChange}
-                      >
-                        <option>Select Department</option>
-                        <option value="Mechanical">Mechanical</option>
-                        <option value="Electrical">Electrical</option>
-                        <option value="Civil">Civil</option>
-                      </Form.Select>
-                    </div>
-                  </Col>
-                  <Col>
-                    <div>
-                      <label htmlFor="year">Year</label>
-                      <br />
-                      <Form.Select
-                        aria-label="Select Year"
-                        className={style.input}
-                        name="year"
-                        value={userDetails.year}
-                        onChange={handleChange}
-                      >
-                        <option>Select Year</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                      </Form.Select>
-                    </div>
-                  </Col>
+                  {type === "student" && (
+                    <>
+                      <Col>
+                        <div>
+                          <label htmlFor="department">Department</label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select Department"
+                            className={style.input}
+                            name="department"
+                            value={userDetails.department}
+                            onChange={handleChange}
+                          >
+                            <option>Select Department</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Civil">Civil</option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="year">Year</label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select Year"
+                            className={style.input}
+                            name="year"
+                            value={userDetails.year}
+                            onChange={handleChange}
+                          >
+                            <option>Select Year</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                    </>
+                  )}
+                  {type === "teacher" && (
+                    <>
+                      <Col></Col>
+                      <Col></Col>
+                    </>
+                  )}
                 </Row>
                 <br />
-                <Row>
-                  <Col>
-                    <div>
-                      <label htmlFor="gpa">GPA</label>
-                      <br />
-                      <Form.Control
-                        type="text"
-                        placeholder="GPA"
-                        name="gpa"
-                        id="gpa"
-                        value={userDetails.gpa}
-                        onChange={handleChange}
-                        className={style.input}
-                        autoComplete="off"
-                        required
-                      />
-                    </div>
-                  </Col>
-                  <Col>
-                    <div>
-                      <label htmlFor="aadhaar">Aadhaar No</label>
-                      <br />
-                      <Form.Control
-                        type="number"
-                        placeholder="Aadhaar No."
-                        name="aadhaar"
-                        id="aadhaar"
-                        className={style.input}
-                        value={userDetails.aadhaar}
-                        onChange={handleAadharChange}
-                        autoComplete="off"
-                        required
-                        minLength={12}
-                        size={12}
-                        maxLength={12}
-                      />
-                      {aadharError && (
-                        <span className="error">{aadharError}</span>
-                      )}
-                    </div>
-                  </Col>
-                  <Col>
-                    <div>
-                      <label htmlFor="pan">PAN</label>
-                      <br />
-                      <Form.Control
-                        type="text"
-                        placeholder="PAN"
-                        name="pan"
-                        id="pan"
-                        value={userDetails.pan}
-                        onChange={handlePanChange}
-                        className={style.input}
-                        autoComplete="off"
-                        required
-                        minLength={10}
-                        size={10}
-                        maxLength={10}
-                      />
-                      {panError && <span className="error">{panError}</span>}
-                    </div>
-                  </Col>
-                </Row>
-                <br />
-                <Row>
-                  <Col>
-                    <div>
-                      <label htmlFor="achievements">Achievements</label>
-                      <br />
-                      <Form.Control
-                        type="text"
-                        placeholder="Achievements"
-                        name="achievements"
-                        id="achievements"
-                        onBlur={() =>
-                          addToList("achievements", achievementsRef)
-                        }
-                        className={style.input}
-                        autoComplete="off"
-                        ref={achievementsRef}
-                      />
-                    </div>
-                  </Col>
-
-                  <Col>
-                    <div>
-                      <label htmlFor="skills">Skills</label>
-                      <br />
-                      <Form.Control
-                        type="text"
-                        placeholder="Skills"
-                        name="skills"
-                        onBlur={() => addToList("skills", skillsRef)}
-                        id="skills"
-                        className={style.input}
-                        autoComplete="off"
-                        ref={skillsRef}
-                      />
-                    </div>
-                  </Col>
-                  <Col>
-                    <div>
-                      <label htmlFor="interests">Interests</label>
-                      <br />
-                      <Form.Control
-                        type="text"
-                        placeholder="Interests"
-                        name="interests"
-                        id="interests"
-                        ref={interestRef}
-                        className={style.input}
-                        autoComplete="off"
-                        onBlur={() => addToList("interests", interestRef)}
-                      />
-                    </div>
-                  </Col>
-                </Row>
-                <br />
-                <Row>
-                  <Col>
-                    <ul>
-                      {userDetails.achievements.length > 0 &&
-                        userDetails.achievements.map((achievement, index) => (
-                          <li key={index}>
-                            {achievement}{" "}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                removeFromList("achievements", index)
+                {type === "student" && (
+                  <>
+                    <Row>
+                      <Col>
+                        <div>
+                          <label htmlFor="gpa">GPA</label>
+                          <br />
+                          <Form.Control
+                            type="number"
+                            placeholder="GPA"
+                            name="gpa"
+                            id="gpa"
+                            value={userDetails.gpa}
+                            onChange={handleChange}
+                            className={style.input}
+                            autoComplete="off"
+                            required
+                          />
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="aadhaar">Aadhaar No</label>
+                          <br />
+                          <Form.Control
+                            type="number"
+                            placeholder="Aadhaar No."
+                            name="aadhaar"
+                            id="aadhaar"
+                            className={style.input}
+                            value={userDetails.aadhaar}
+                            onChange={handleAadharChange}
+                            autoComplete="off"
+                            required
+                            minLength={12}
+                            size={12}
+                            maxLength={12}
+                          />
+                          {aadharError && (
+                            <span className="error">{aadharError}</span>
+                          )}
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="pan">PAN</label>
+                          <br />
+                          <Form.Control
+                            type="text"
+                            placeholder="PAN"
+                            name="pan"
+                            id="pan"
+                            value={userDetails.pan}
+                            onChange={handlePanChange}
+                            className={style.input}
+                            autoComplete="off"
+                            required
+                            minLength={10}
+                            size={10}
+                            maxLength={10}
+                          />
+                          {panError && (
+                            <span className="error">{panError}</span>
+                          )}
+                        </div>
+                      </Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col>
+                        <div>
+                          <label htmlFor="caste">Caste</label>
+                          <br />
+                          <Form.Control
+                            type="text"
+                            placeholder="Caste"
+                            name="caste"
+                            id="caste"
+                            value={userDetails.caste}
+                            onChange={handleChange}
+                            className={style.input}
+                            autoComplete="off"
+                            required
+                          />
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="gender">Gender</label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select Gender"
+                            className={style.input}
+                            name="gender"
+                            onChange={handleChange}
+                          >
+                            <option value="">Select Gender</option>
+                            <option
+                              selected={userDetails.gender == "male"}
+                              value="male"
+                            >
+                              Male
+                            </option>
+                            <option
+                              selected={userDetails.gender == "female"}
+                              value="female"
+                            >
+                              Female
+                            </option>
+                            <option
+                              selected={userDetails.gender == "other"}
+                              value="other"
+                            >
+                              Other
+                            </option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="category">Category</label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select Category"
+                            className={style.input}
+                            name="category"
+                            onChange={handleChange}
+                          >
+                            <option value="">Select Category</option>
+                            <option
+                              selected={userDetails.category == "obc"}
+                              value="obc"
+                            >
+                              OBC
+                            </option>
+                            <option
+                              selected={userDetails.category == "sc"}
+                              value="sc"
+                            >
+                              SC
+                            </option>
+                            <option
+                              selected={userDetails.category == "st"}
+                              value="st"
+                            >
+                              ST
+                            </option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col>
+                        <div>
+                          <label htmlFor="specially_abled">
+                            Are you Specially Abled
+                          </label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select specially abled"
+                            className={style.input}
+                            name="specially_abled"
+                            onChange={handleChange}
+                          >
+                            <option value="">Are you specially abled</option>
+                            <option
+                              selected={userDetails.specially_abled == 1}
+                              value="1"
+                            >
+                              Yes
+                            </option>
+                            <option
+                              selected={userDetails.specially_abled == 0}
+                              value="0"
+                            >
+                              No
+                            </option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="income">Income of the Family</label>
+                          <br />
+                          <Form.Select
+                            aria-label="Select income of the family"
+                            className={style.input}
+                            name="family_income"
+                            onChange={handleChange}
+                          >
+                            <option value="">Family Income</option>
+                            <option
+                              selected={userDetails.family_income === "<1L"}
+                              value="<1L"
+                            >
+                              1 Lakh and below
+                            </option>
+                            <option
+                              selected={
+                                userDetails.family_income === "1L - 2.5L"
                               }
+                              value="1L-2.5L"
                             >
-                              X
-                            </button>
-                          </li>
-                        ))}
-                    </ul>
-                  </Col>
-
-                  <Col>
-                    <ul>
-                      {userDetails.skills.length > 0 &&
-                        userDetails.skills.map((skill, index) => (
-                          <li key={index}>
-                            {skill}{" "}
-                            <button
-                              type="button"
-                              onClick={() => removeFromList("skills", index)}
+                              1 Lakh to 2.5 Lakh
+                            </option>
+                            <option
+                              selected={
+                                userDetails.family_income === "2.5L - 8L"
+                              }
+                              value="2.5L-8L"
                             >
-                              X
-                            </button>
-                          </li>
-                        ))}
-                    </ul>
-                  </Col>
-
-                  <Col>
-                    <ul>
-                      {userDetails.interests.length > 0 &&
-                        userDetails.interests.map((interest, index) => (
-                          <li key={index}>
-                            {interest}{" "}
-                            <button
-                              type="button"
-                              onClick={() => removeFromList("interests", index)}
+                              2.5 Lakh to 8 Lakh
+                            </option>
+                            <option
+                              selected={userDetails.family_income === ">8L"}
+                              value=">8L"
                             >
-                              X
-                            </button>
-                          </li>
-                        ))}
-                    </ul>
-                  </Col>
-                </Row>
+                              8 Lakh and above
+                            </option>
+                          </Form.Select>
+                        </div>
+                      </Col>
+                      <Col>
+                        <div>
+                          <label htmlFor="achievements">Achievements</label>
+                          <br />
+                          <Form.Control
+                            type="text"
+                            placeholder="Achievements"
+                            name="achievements"
+                            id="achievements"
+                            onBlur={() =>
+                              addToList("achievements", achievementsRef)
+                            }
+                            className={style.input}
+                            autoComplete="off"
+                            ref={achievementsRef}
+                          />
+                        </div>
+                      </Col>
+                    </Row>
+                    <br />
+                    <Row>
+                      <Col></Col>
+                      <Col></Col>
+                      <Col>
+                        <ul>
+                          {userDetails.achievements.length > 0 &&
+                            userDetails.achievements.map(
+                              (achievement, index) => (
+                                <li key={index}>
+                                  {achievement}{" "}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      removeFromList("achievements", index)
+                                    }
+                                  >
+                                    X
+                                  </button>
+                                </li>
+                              )
+                            )}
+                        </ul>
+                      </Col>
+                    </Row>
+                  </>
+                )}
               </Container>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseModal}>
@@ -576,6 +731,19 @@ const List = ({ type }) => {
           )}
         </Modal.Body>
       </Modal>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </>
   );
 };
