@@ -37,8 +37,8 @@ const Login = () => {
       setError(response.message);
     } else {
       navigate("/dashboard");
+      dispatch(userLogin(response.user));
     }
-    dispatch(userLogin(response.user));
   };
 
   return (

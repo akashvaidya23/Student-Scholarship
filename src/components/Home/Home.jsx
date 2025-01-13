@@ -17,10 +17,10 @@ const Home = () => {
           </Button>
           <Button
             as={Link}
-            to={"/login/?role=teacher"}
+            to={"/login/?role=scholarship officer"}
             variant="outline-primary"
           >
-            Teacher
+            Scholarship Officer
           </Button>
           <Button as={Link} to={"/login/?role=admin"} variant="outline-primary">
             Admin

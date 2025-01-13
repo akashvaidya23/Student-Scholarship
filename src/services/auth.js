@@ -62,13 +62,14 @@ const login = async (payload) => {
  * @param {string} payload.role
  * @returns {Promise<Object>}
  */
-const registerUser = async (payload, is_login) => {
+const registerUser = async (payload, is_login = true) => {
   try {
     const response = await axios({
       method: "post",
       url: `${localBaseUrl}api/users`,
       data: payload,
     });
+    console.log("response ", response);
 
     if (response.data.status == false) {
       return response.data;

@@ -7,6 +7,8 @@ import {
   Container,
   Row,
   Col,
+  Badge,
+  FloatingLabel,
 } from "react-bootstrap";
 import style from "./List.module.css";
 import { getUsers } from "../../services/roles";
@@ -131,6 +133,13 @@ const List = ({ type }) => {
       ...prevDetails,
       [listName]: prevDetails[listName].filter((_, i) => i !== index),
     }));
+  };
+
+  const [active, setActive] = useState("off");
+  const handleChangeVerify = (e) => {
+    const verify = e.target.value;
+    console.log(verify);
+    verify == "1" ? setActive("verified") : setActive("not verified");
   };
 
   const handleDelete = async (user) => {
@@ -301,6 +310,11 @@ const List = ({ type }) => {
                     <Button variant="danger" onClick={() => handleDelete(user)}>
                       Delete
                     </Button>
+                    {user.verified == 1 ? (
+                      <Button variant="success">Verified</Button>
+                    ) : (
+                      <Button variant="info">Verify Now</Button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -716,6 +730,49 @@ const List = ({ type }) => {
                         </ul>
                       </Col>
                     </Row>
+                    <Row>
+                      <Col>
+                        <label htmlFor="verify_changes">Verify Changes?</label>
+                        <br />
+                        <Form.Check
+                          inline
+                          label="Accept"
+                          name="verify"
+                          type="radio"
+                          value="1"
+                          selected={active == "verified"}
+                          onChange={handleChangeVerify}
+                        />
+                        <Form.Check
+                          inline
+                          label="Reject"
+                          name="verify"
+                          type="radio"
+                          value="0"
+                          selected={active == "not verified"}
+                          onChange={handleChangeVerify}
+                        />
+                      </Col>
+                      <Col>
+                        {active == "not verified" && (
+                          <>
+                            <label htmlFor="comments">Comments</label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Caste"
+                              name="caste"
+                              id="caste"
+                              value={userDetails.comment}
+                              onChange={handleChange}
+                              className={style.input}
+                              autoComplete="off"
+                            />
+                          </>
+                        )}
+                      </Col>
+                      <Col></Col>
+                    </Row>
+                    <br />
                   </>
                 )}
               </Container>

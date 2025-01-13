@@ -4,8 +4,11 @@ import Form from "react-bootstrap/Form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { registerUser } from "../../services/auth.js";
+import { useDispatch } from "react-redux";
+import { userLogin } from "../../features/user/userSlice.js";
 
 const Register = () => {
+  const dispatch = useDispatch();
   const [params] = useSearchParams();
   const role = params.get("role");
   const navigate = useNavigate();
@@ -49,6 +52,7 @@ const Register = () => {
       role,
     };
     const response = await registerUser(updatedPayload);
+    console.log(response);
     if (response.status == false) {
       setError(response.message);
       return false;
@@ -59,6 +63,7 @@ const Register = () => {
       userNameRef.current.value = null;
       passwordRef.current.value = null;
       confirmPasswordRef.current.value = null;
+      dispatch(userLogin(response.user));
       navigate("/dashboard");
     }
   };

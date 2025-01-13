@@ -54,7 +54,7 @@ function Navigation() {
                 </Nav.Link>
               )}
 
-              {user && ["admin", "teacher"].includes(user.role) && (
+              {user && ["admin", "scholarship officer"].includes(user.role) && (
                 <Nav.Link as={Link} to="/students" className="text-white">
                   Students
                 </Nav.Link>
