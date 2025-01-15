@@ -24,6 +24,7 @@ const List = ({ type }) => {
   const [toastColor, setToastColor] = useState("");
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showVerifyModel, setShowVerifyModel] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState({
     name: "",
@@ -78,6 +79,8 @@ const List = ({ type }) => {
         gender: selectedUser.gender || "",
         specially_abled: selectedUser.specially_abled || "",
         family_income: selectedUser.family_income || "",
+        verified: selectedUser.verified || "",
+        comments: selectedUser.comments || "",
       });
     }
   }, [selectedUser]);
@@ -118,13 +121,16 @@ const List = ({ type }) => {
   const isValidPAN = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
 
   const addToList = (listName, ref) => {
-    if (ref.current.value) {
+    if (ref.current?.value) {
+      const inputValue = ref.current.value;
       setUserDetails((prevDetails) => ({
         ...prevDetails,
-        [listName]: [...prevDetails[listName], ref.current.value],
+        achievements: [...(prevDetails.achievements || []), inputValue],
       }));
       ref.current.value = "";
       ref.current.focus();
+    } else {
+      console.warn("Input is empty or ref is not defined.");
     }
   };
 
@@ -140,6 +146,18 @@ const List = ({ type }) => {
     const verify = e.target.value;
     console.log(verify);
     verify == "1" ? setActive("verified") : setActive("not verified");
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      verified: verify,
+    }));
+  };
+
+  const handleChangeComments = (e) => {
+    const comments = e.target.value;
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      comments: comments,
+    }));
   };
 
   const handleDelete = async (user) => {
@@ -179,13 +197,24 @@ const List = ({ type }) => {
     setShowModal(true);
   };
 
+  const handleVerify = (action, user) => {
+    setShowVerifyModel(true);
+    setAction(action);
+    setSelectedUser(user);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
   };
 
+  const handleCloseVerifyModal = () => {
+    setShowVerifyModel(false);
+    setSelectedUser(null);
+  };
+
   const handleSave = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     setMobileError("");
     setError("");
 
@@ -207,6 +236,10 @@ const List = ({ type }) => {
       return false;
     }
 
+    if (userDetails.verified == 1) {
+      userDetails.comments = "";
+    }
+
     const updatedPayload = {
       name: userDetails.name,
       email: userDetails.email,
@@ -219,8 +252,15 @@ const List = ({ type }) => {
       pan: userDetails.pan,
       achievements: userDetails.achievements.join(","),
       role: type,
+      caste: userDetails.caste,
+      category: userDetails.category,
+      gender: userDetails.gender,
+      specially_abled: userDetails.specially_abled,
+      family_income: userDetails.family_income,
+      verified: userDetails.verified,
+      comments: userDetails.comments,
     };
-    console.log(userDetails.id);
+    console.log(userDetails);
     // return false;
     try {
       let response = null;
@@ -254,6 +294,7 @@ const List = ({ type }) => {
     }
   };
 
+  console.log("userDetails ", userDetails);
   return (
     <>
       <h3 className={style.heading}>
@@ -301,19 +342,31 @@ const List = ({ type }) => {
                       textAlign: "center",
                     }}
                   >
-                    <Button
-                      variant="primary"
-                      onClick={() => handleEdit("Edit", user)}
-                    >
-                      Edit
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDelete(user)}>
-                      Delete
-                    </Button>
-                    {user.verified == 1 ? (
+                    {user.role == "admin" && (
+                      <>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleDelete(user)}
+                        >
+                          Delete
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleEdit("Edit", user)}
+                        >
+                          Edit
+                        </Button>
+                      </>
+                    )}
+                    {user.verified == 1 && user.role != "student" ? (
                       <Button variant="success">Verified</Button>
                     ) : (
-                      <Button variant="info">Verify Now</Button>
+                      <Button
+                        variant="info"
+                        onClick={() => handleVerify("Verify Details", user)}
+                      >
+                        Verify Now
+                      </Button>
                     )}
                   </div>
                 </td>
@@ -322,6 +375,116 @@ const List = ({ type }) => {
           </tbody>
         </Table>
       </div>
+      <Modal
+        size="lg"
+        show={showVerifyModel}
+        onHide={handleCloseVerifyModal}
+        className={style.customModalWidth}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{action}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedUser && (
+            <Table>
+              <tr>
+                <th className={style.cell}>Name:</th>
+                <td className={style.cell}>{selectedUser.name}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Username:</th>
+                <td className={style.cell}>{selectedUser.username}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Email:</th>
+                <td className={style.cell}>{selectedUser.email}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Mobile:</th>
+                <td className={style.cell}>{selectedUser.mobile_no}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Department:</th>
+                <td className={style.cell}>{selectedUser.department}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Year:</th>
+                <td className={style.cell}>{selectedUser.year}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>GPA:</th>
+                <td className={style.cell}>{selectedUser.gpa}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Aadhaar:</th>
+                <td className={style.cell}>{selectedUser.aadhar}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>PAN:</th>
+                <td className={style.cell}>{selectedUser.pan}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Caste:</th>
+                <td className={style.cell}>{selectedUser.caste}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Category:</th>
+                <td className={style.cell}>{selectedUser.category}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Gender:</th>
+                <td className={style.cell}>{selectedUser.gender}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Specialy Abled:</th>
+                <td className={style.cell}>{selectedUser.specially_abled}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Family Income:</th>
+                <td className={style.cell}>{selectedUser.family_income}</td>
+              </tr>
+              <tr>
+                <th className={style.cell}>Achievements</th>
+                <td className={style.cell}>{selectedUser.achievements}</td>
+              </tr>
+              <tr>
+                <td>
+                  <Form.Check
+                    inline
+                    label="Accept"
+                    name="verify"
+                    type="radio"
+                    value="1"
+                    checked={userDetails.verified == 1}
+                    onChange={handleChangeVerify}
+                  />
+                  <Form.Check
+                    inline
+                    label="Reject"
+                    name="verify"
+                    type="radio"
+                    value="0"
+                    checked={userDetails.verified == 0}
+                    onChange={handleChangeVerify}
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="text"
+                    placeholder="Add Comments"
+                    name="caste"
+                    id="caste"
+                    value={userDetails.comments}
+                    onChange={handleChangeComments}
+                    className={style.input}
+                    autoComplete="off"
+                  />
+                </td>
+              </tr>
+            </Table>
+          )}
+        </Modal.Body>
+      </Modal>
 
       <Modal
         size="lg"
@@ -707,8 +870,45 @@ const List = ({ type }) => {
                     </Row>
                     <br />
                     <Row>
-                      <Col></Col>
-                      <Col></Col>
+                      <Col>
+                        <label htmlFor="verify_changes">Verify Changes?</label>
+                        <br />
+                        <Form.Check
+                          inline
+                          label="Accept"
+                          name="verify"
+                          type="radio"
+                          value="1"
+                          checked={userDetails.verified == 1}
+                          onChange={handleChangeVerify}
+                        />
+                        <Form.Check
+                          inline
+                          label="Reject"
+                          name="verify"
+                          type="radio"
+                          value="0"
+                          checked={userDetails.verified == 0}
+                          onChange={handleChangeVerify}
+                        />
+                      </Col>
+                      <Col>
+                        {userDetails.verified == 0 && (
+                          <>
+                            <label htmlFor="comments">Comments</label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Add Comments"
+                              name="caste"
+                              id="caste"
+                              value={userDetails.comments}
+                              onChange={handleChangeComments}
+                              className={style.input}
+                              autoComplete="off"
+                            />
+                          </>
+                        )}
+                      </Col>
                       <Col>
                         <ul>
                           {userDetails.achievements.length > 0 &&
@@ -729,48 +929,6 @@ const List = ({ type }) => {
                             )}
                         </ul>
                       </Col>
-                    </Row>
-                    <Row>
-                      <Col>
-                        <label htmlFor="verify_changes">Verify Changes?</label>
-                        <br />
-                        <Form.Check
-                          inline
-                          label="Accept"
-                          name="verify"
-                          type="radio"
-                          value="1"
-                          selected={active == "verified"}
-                          onChange={handleChangeVerify}
-                        />
-                        <Form.Check
-                          inline
-                          label="Reject"
-                          name="verify"
-                          type="radio"
-                          value="0"
-                          selected={active == "not verified"}
-                          onChange={handleChangeVerify}
-                        />
-                      </Col>
-                      <Col>
-                        {active == "not verified" && (
-                          <>
-                            <label htmlFor="comments">Comments</label>
-                            <Form.Control
-                              type="text"
-                              placeholder="Caste"
-                              name="caste"
-                              id="caste"
-                              value={userDetails.comment}
-                              onChange={handleChange}
-                              className={style.input}
-                              autoComplete="off"
-                            />
-                          </>
-                        )}
-                      </Col>
-                      <Col></Col>
                     </Row>
                     <br />
                   </>
