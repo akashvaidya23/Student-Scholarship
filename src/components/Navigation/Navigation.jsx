@@ -50,7 +50,7 @@ function Navigation() {
             >
               {user && user.role === "admin" && (
                 <Nav.Link as={Link} to="/teachers" className="text-white">
-                  Teachers
+                  Scholarship Officers
                 </Nav.Link>
               )}
 
@@ -60,32 +60,31 @@ function Navigation() {
                 </Nav.Link>
               )}
 
-              {user && user.role == "admin" && (
-                <Nav.Link as={Link} to="/verify" className="text-white">
-                  Verify Details
-                </Nav.Link>
-              )}
-
-              {user && user.role == "student" && (
+              {user && user.role === "student" && (
                 <Nav.Link as={Link} to="/profile" className="text-white">
                   Profile
                 </Nav.Link>
               )}
-              {user && user.role == "admin" && (
-                <Nav.Link as={Link} to="/departments" className="text-white">
-                  Departments
-                </Nav.Link>
-              )}
-              {user && (
+            </Nav>
+            {user && (
+              <Nav className="ms-auto">
                 <Nav.Link
                   as={Link}
                   className="text-white"
+                  style={{ cursor: "default" }}
+                  disabled
+                >
+                  {user.name}
+                </Nav.Link>
+                <Nav.Link
+                  className="text-white"
                   onClick={handleLogout}
+                  style={{ cursor: "pointer" }}
                 >
                   Logout
                 </Nav.Link>
-              )}
-            </Nav>
+              </Nav>
+            )}
           </Navbar.Collapse>
         </Container>
       </Navbar>

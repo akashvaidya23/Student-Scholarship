@@ -16,7 +16,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = "Student Sign In";
+    document.title = `${role.charAt(0).toUpperCase() + role.slice(1)} Login`;
   }, []);
 
   const usernameRef = useRef();
@@ -75,10 +75,14 @@ const Login = () => {
         </div>
         <br />
         <p className={style.para}>
-          New to this site{" "}
-          <Link className={style.link} to={`/register/?role=${role}`}>
-            Register
-          </Link>
+          {role != "admin" && (
+            <>
+              New to this site{" "}
+              <Link className={style.link} to={`/register/?role=${role}`}>
+                Register
+              </Link>
+            </>
+          )}
         </p>
       </form>
     </div>

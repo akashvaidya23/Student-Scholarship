@@ -12,17 +12,34 @@ import {
 } from "react-bootstrap";
 import style from "./List.module.css";
 import { getUsers } from "../../services/roles";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { deleteUser, registerUser, updateUser } from "../../services/auth";
+import {
+  checkIfLoggedIn,
+  deleteUser,
+  getUserDetails,
+  registerUser,
+  updateUser,
+} from "../../services/auth";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 
 const List = ({ type }) => {
   const notify = (message) => {
     return toast(message);
   };
+  const user = checkIfLoggedIn();
+
+  const getUser = useCallback(async () => {
+    try {
+      const userDetails = await getUserDetails(user);
+      setCurrentUser(userDetails.data[0]);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [user]);
   const [toastColor, setToastColor] = useState("");
   const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [showVerifyModel, setShowVerifyModel] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -55,6 +72,12 @@ const List = ({ type }) => {
   const achievementsRef = useRef();
 
   useEffect(() => {
+    document.title = `List ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    getUser();
+  }, [getUser]);
+
+  useEffect(() => {
+    document.title = `List ${type.charAt(0).toUpperCase() + type.slice(1)}`;
     handleFetchUsers();
   }, [type]);
 
@@ -213,11 +236,11 @@ const List = ({ type }) => {
     setSelectedUser(null);
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async (e, action) => {
     e.preventDefault();
     setMobileError("");
     setError("");
-
+    setAction(action);
     // Check mobile number length
     if (userDetails.mobileNo.length !== 10) {
       setMobileError("Mobile Number should be 10 digits");
@@ -238,6 +261,73 @@ const List = ({ type }) => {
 
     if (userDetails.verified == 1) {
       userDetails.comments = "";
+    }
+
+    if (
+      action == "verify" &&
+      userDetails.verified == 0 &&
+      userDetails.comments == ""
+    ) {
+      toast.error("Comments cannot be empty", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      return false;
+    }
+
+    if (
+      !userDetails.name ||
+      !userDetails.email ||
+      !userDetails.username ||
+      !userDetails.mobileNo ||
+      !userDetails.department ||
+      !userDetails.year ||
+      !userDetails.gpa ||
+      !userDetails.aadhaar ||
+      !userDetails.pan ||
+      !userDetails.caste ||
+      !userDetails.category ||
+      !userDetails.gender ||
+      !userDetails.specially_abled ||
+      !userDetails.family_income
+    ) {
+      if (userDetails.verified == 1) {
+        toast.error(
+          "Can not accept the application when some fields are empty",
+          {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+          }
+        );
+        return false;
+      } else if (action != "verify") {
+        toast.error("All fields are required", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        return false;
+      }
     }
 
     const updatedPayload = {
@@ -284,6 +374,7 @@ const List = ({ type }) => {
           transition: Bounce,
         });
         setShowModal(false);
+        setShowVerifyModel(false);
         handleFetchUsers();
       }
     } catch (error) {
@@ -295,25 +386,29 @@ const List = ({ type }) => {
   };
 
   console.log("userDetails ", userDetails);
+  console.log("user ", currentUser.role);
+
   return (
     <>
       <h3 className={style.heading}>
         List of {type.charAt(0).toUpperCase() + type.slice(1)}
       </h3>
       <div className={style.main}>
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            float: "right",
-            marginBottom: "10px",
-          }}
-        >
-          <Button onClick={() => handleEdit("Add", {})} variant="success">
-            Add
-          </Button>
-        </div>
+        {currentUser.role == "admin" && (
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+              float: "right",
+              marginBottom: "10px",
+            }}
+          >
+            <Button onClick={() => handleEdit("Add", {})} variant="success">
+              Add
+            </Button>
+          </div>
+        )}
         <br />
         <Table>
           <thead>
@@ -342,7 +437,7 @@ const List = ({ type }) => {
                       textAlign: "center",
                     }}
                   >
-                    {user.role == "admin" && (
+                    {currentUser?.role === "admin" && user.verified != 1 && (
                       <>
                         <Button
                           variant="danger"
@@ -358,16 +453,17 @@ const List = ({ type }) => {
                         </Button>
                       </>
                     )}
-                    {user.verified == 1 && user.role != "student" ? (
-                      <Button variant="success">Verified</Button>
-                    ) : (
-                      <Button
-                        variant="info"
-                        onClick={() => handleVerify("Verify Details", user)}
-                      >
-                        Verify Now
-                      </Button>
-                    )}
+                    {user.role === "student" &&
+                      (user.verified === 0 ? (
+                        <Button
+                          variant="info"
+                          onClick={() => handleVerify("Verify Details", user)}
+                        >
+                          Verify Now
+                        </Button>
+                      ) : (
+                        <Button variant="success">Verified</Button>
+                      ))}
                   </div>
                 </td>
               </tr>
@@ -448,7 +544,7 @@ const List = ({ type }) => {
                 <td className={style.cell}>{selectedUser.achievements}</td>
               </tr>
               <tr>
-                <td>
+                <td className={style.cell}>
                   <Form.Check
                     inline
                     label="Accept"
@@ -468,19 +564,35 @@ const List = ({ type }) => {
                     onChange={handleChangeVerify}
                   />
                 </td>
-                <td>
-                  <Form.Control
-                    type="text"
-                    placeholder="Add Comments"
-                    name="caste"
-                    id="caste"
-                    value={userDetails.comments}
-                    onChange={handleChangeComments}
-                    className={style.input}
-                    autoComplete="off"
-                  />
+                <td className={style.cell}>
+                  {userDetails.verified == 0 && (
+                    <Form.Control
+                      type="text"
+                      placeholder="Add Comments"
+                      name="caste"
+                      id="caste"
+                      value={userDetails.comments}
+                      onChange={handleChangeComments}
+                      className={style.input}
+                      style={{
+                        border: "1px solid black",
+                        borderWidth: "3px",
+                      }}
+                      autoComplete="off"
+                      required={!userDetails.verified}
+                    />
+                  )}
                 </td>
               </tr>
+              <br />
+              <Button
+                variant="primary"
+                onClick={(e) => {
+                  handleSave(e, "verify");
+                }}
+              >
+                Submit
+              </Button>
             </Table>
           )}
         </Modal.Body>
@@ -499,7 +611,11 @@ const List = ({ type }) => {
         </Modal.Header>
         <Modal.Body>
           {selectedUser && (
-            <Form onSubmit={handleSave}>
+            <Form
+              onSubmit={(e) => {
+                handleSave(e, "update");
+              }}
+            >
               <Container>
                 <Row>
                   <Col>
@@ -870,48 +986,11 @@ const List = ({ type }) => {
                     </Row>
                     <br />
                     <Row>
-                      <Col>
-                        <label htmlFor="verify_changes">Verify Changes?</label>
-                        <br />
-                        <Form.Check
-                          inline
-                          label="Accept"
-                          name="verify"
-                          type="radio"
-                          value="1"
-                          checked={userDetails.verified == 1}
-                          onChange={handleChangeVerify}
-                        />
-                        <Form.Check
-                          inline
-                          label="Reject"
-                          name="verify"
-                          type="radio"
-                          value="0"
-                          checked={userDetails.verified == 0}
-                          onChange={handleChangeVerify}
-                        />
-                      </Col>
-                      <Col>
-                        {userDetails.verified == 0 && (
-                          <>
-                            <label htmlFor="comments">Comments</label>
-                            <Form.Control
-                              type="text"
-                              placeholder="Add Comments"
-                              name="caste"
-                              id="caste"
-                              value={userDetails.comments}
-                              onChange={handleChangeComments}
-                              className={style.input}
-                              autoComplete="off"
-                            />
-                          </>
-                        )}
-                      </Col>
+                      <Col></Col>
+                      <Col></Col>
                       <Col>
                         <ul>
-                          {userDetails.achievements.length > 0 &&
+                          {userDetails.achievements?.length > 0 &&
                             userDetails.achievements.map(
                               (achievement, index) => (
                                 <li key={index}>

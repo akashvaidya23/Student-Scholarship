@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [userDetails, setUserDetails] = useState({});
 
   useEffect(() => {
+    document.title = "Dashboard";
     getUser();
   }, []);
 
@@ -24,9 +25,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <h5>
-        Welcome {userDetails.name}. You are a {userDetails.role}
-      </h5>
+      <h5>Welcome {userDetails.name}.</h5>
     </>
   );
 };

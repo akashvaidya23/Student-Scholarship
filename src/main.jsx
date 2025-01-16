@@ -13,9 +13,7 @@ import "./App.css";
 import List from "./components/List/List.jsx";
 import Create from "./components/Create/Create.jsx";
 import Edit from "./components/Edit/Edit.jsx";
-import Verify from "./components/Verify/Verify.jsx";
 import Profile from "./components/Profile/Profile.jsx";
-import Departments from "./components/Departments/Departments.jsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 
@@ -59,7 +57,7 @@ const router = createBrowserRouter([
         path: "/teachers",
         element: (
           <CheckIfAuth>
-            <List type="teacher" />
+            <List type="scholarship officer" />
           </CheckIfAuth>
         ),
         children: [
@@ -78,20 +76,8 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/verify",
-        element: (
-          <CheckIfAuth>
-            <Verify />
-          </CheckIfAuth>
-        ),
-      },
-      {
         path: "/profile",
         element: <Profile />,
-      },
-      {
-        path: "/departments",
-        element: <Departments />,
       },
     ],
   },

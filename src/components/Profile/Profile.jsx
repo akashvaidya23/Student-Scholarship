@@ -23,6 +23,7 @@ const Profile = () => {
     pan: "",
     skills: "",
     interests: "",
+    verified: 0,
   });
   const [mobileError, setMobileError] = useState("");
   const [panError, setPanError] = useState("");
@@ -89,7 +90,6 @@ const Profile = () => {
     const achievements = [...userDetails.achievements.split(",")];
     achievements.splice(index, 1);
     user.achievements = achievements.join(",");
-    console.log(achievements.join(","));
     setUserDetails(user);
   };
 
@@ -124,7 +124,6 @@ const Profile = () => {
       alert("Profile updated successfully");
     }
   };
-  console.log(userDetails);
 
   return (
     <div className={style.main}>
@@ -482,13 +481,38 @@ const Profile = () => {
               </ul>
             </Col>
           </Row>
+          <Row>
+            <Col>
+              <div>
+                <label htmlFor="status">Status</label>
+                <br />
+                {userDetails.verified == 1 ? (
+                  <b style={{ color: "green" }}>Verified</b>
+                ) : (
+                  <b style={{ color: "red" }}>Rejected</b>
+                )}
+              </div>
+            </Col>
+            {userDetails.verified == 0 && userDetails.comments && (
+              <Col>
+                <div>
+                  <label htmlFor="status">Comments:</label>
+                  <br />
+                  <b>{userDetails.comments}</b>
+                </div>
+              </Col>
+            )}
+            <Col></Col>
+          </Row>
         </Container>
         <br />
-        <div className={style.button}>
-          <Button type="submit" varient="primary">
-            Update
-          </Button>
-        </div>
+        {userDetails.verified == 0 && (
+          <div className={style.button}>
+            <Button type="submit" varient="primary">
+              Update
+            </Button>
+          </div>
+        )}
       </form>
     </div>
   );
