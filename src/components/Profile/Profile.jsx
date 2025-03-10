@@ -4,18 +4,19 @@ import PropTypes from "prop-types";
 import style from "./Profile.module.css";
 import {
   checkIfLoggedIn,
+  getScholarships,
   getUserDetails,
   updateUser,
 } from "../../services/auth.js";
 
 const Profile = () => {
   const [error, setError] = useState("");
+  const [scholarships, setScholarships] = useState([]);
   const [userDetails, setUserDetails] = useState({
     name: "",
     mobileNo: "",
     email: "",
     username: "",
-    achievements: "",
     department: "",
     year: "",
     gpa: "",
@@ -40,8 +41,6 @@ const Profile = () => {
     }
   }, [user]);
 
-  const achievementsRef = useRef();
-
   useEffect(() => {
     document.title = "Profile";
     getUser();
@@ -55,7 +54,7 @@ const Profile = () => {
     }));
   };
 
-  const isValidAadhaar = (aadhaar) => /^[2-9]{1}[0-9]{11}$/.test(aadhaar);
+  const isValidAadhaar = (aadhaar) => /^[1-9]{1}[0-9]{11}$/.test(aadhaar);
   const isValidPAN = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
 
   const handleAadharChange = (e) => {
@@ -72,25 +71,6 @@ const Profile = () => {
       ...prevDetails,
       pan: value,
     }));
-  };
-
-  const handleArrayChange = (e, arrayName, ref) => {
-    if (e.target.value) {
-      setUserDetails((prevDetails) => ({
-        ...prevDetails,
-        [arrayName]: [...prevDetails[arrayName], e.target.value],
-      }));
-      ref.current.value = null;
-      ref.current.focus();
-    }
-  };
-
-  const removeArrayItem = (index) => {
-    const user = { ...userDetails };
-    const achievements = [...userDetails.achievements.split(",")];
-    achievements.splice(index, 1);
-    user.achievements = achievements.join(",");
-    setUserDetails(user);
   };
 
   const updateProfile = async (e) => {
@@ -118,11 +98,35 @@ const Profile = () => {
     }
 
     const response = await updateUser(userDetails.id, userDetails);
+    console.log(response);
+
     if (response.status === false) {
       setError(response.message);
     } else {
       alert("Profile updated successfully");
     }
+  };
+
+  const suggestScholarship = async (e) => {
+    e.preventDefault();
+    let family_income;
+    if (userDetails.family_income == "<1L") {
+      family_income = "low";
+    } else if (userDetails.family_income == "1L-2.5L") {
+      family_income = "medium";
+    } else {
+      family_income = "high";
+    }
+
+    const response = await getScholarships({
+      category: userDetails.category,
+      gender: userDetails.gender,
+      family_income: family_income,
+      gpa: userDetails.gpa,
+      k: 5,
+    });
+    console.log(response);
+    setScholarships(response);
   };
 
   return (
@@ -440,56 +444,56 @@ const Profile = () => {
               </div>
             </Col>
             <Col>
-              <div>
-                <label htmlFor="achievements">Achievements</label>
-                <br />
-                <Form.Control
-                  type="text"
-                  placeholder="Achievements"
-                  name="achievements"
-                  id="achievements"
-                  onBlur={(e) =>
-                    handleArrayChange(e, "achievements", achievementsRef)
-                  }
-                  className={style.input}
-                  autoComplete="off"
-                  ref={achievementsRef}
-                />
-              </div>
+              {userDetails.verified == 2 && (
+                <div>
+                  <label htmlFor="suggest">Suggest Scholarship:</label>
+                  <Button variety="primary" onClick={suggestScholarship}>
+                    Get Scholarships
+                  </Button>
+                  {scholarships.length > 0 && (
+                    <>
+                      <label htmlFor="scholarships">Scholarships:</label>
+                      <br />
+                      {scholarships.map((scholarship) => (
+                        <Form.Check
+                          key={scholarship}
+                          inline
+                          label={scholarship}
+                          name="verify"
+                          type="radio"
+                          value={scholarship}
+                        />
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
             </Col>
           </Row>
           <br />
           <Row>
             <Col>{/* Add specially abled checkbox */}</Col>
             <Col>{/* Add Income Dropdown */}</Col>
-            <Col>
-              <ul>
-                {userDetails.achievements &&
-                  userDetails.achievements
-                    .split(",")
-                    .map((achievement, index) => (
-                      <li key={index}>
-                        {achievement}{" "}
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem(index)}
-                        >
-                          X
-                        </button>
-                      </li>
-                    ))}
-              </ul>
-            </Col>
+            <Col></Col>
           </Row>
           <Row>
             <Col>
               <div>
                 <label htmlFor="status">Status</label>
                 <br />
-                {userDetails.verified == 1 ? (
+                {/* {userDetails.verified == 1 ? (
                   <b style={{ color: "green" }}>Verified</b>
                 ) : (
                   <b style={{ color: "red" }}>Rejected</b>
+                )} */}
+                {userDetails.verified == 0 && (
+                  <b style={{ color: "orange" }}>Pending</b>
+                )}
+                {userDetails.verified == 1 && (
+                  <b style={{ color: "red" }}>Rejected</b>
+                )}
+                {userDetails.verified == 2 && (
+                  <b style={{ color: "green" }}>Verified</b>
                 )}
               </div>
             </Col>

@@ -212,6 +212,20 @@ const updateUser = async (id, payload) => {
     return result;
   } catch (err) {
     console.log(err);
+    // return err;
+  }
+};
+
+const getScholarships = async (payload) => {
+  try {
+    const scholarships = await axios.post(
+      `http://13.203.112.156:5000/recommend`,
+      payload
+    );
+    return scholarships.data;
+  } catch (err) {
+    console.error("Error:", err);
+    throw err;
   }
 };
 
@@ -224,4 +238,5 @@ export {
   deleteUser,
   getUserDetails,
   updateUser,
+  getScholarships,
 };

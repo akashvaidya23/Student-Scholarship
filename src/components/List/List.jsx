@@ -168,7 +168,7 @@ const List = ({ type }) => {
   const handleChangeVerify = (e) => {
     const verify = e.target.value;
     console.log(verify);
-    verify == "1" ? setActive("verified") : setActive("not verified");
+    verify == "1" ? setActive("not verified") : setActive(" verified");
     setUserDetails((prevDetails) => ({
       ...prevDetails,
       verified: verify,
@@ -437,7 +437,7 @@ const List = ({ type }) => {
                       textAlign: "center",
                     }}
                   >
-                    {currentUser?.role === "admin" && user.verified != 1 && (
+                    {currentUser?.role === "admin" && user.verified != 2 && (
                       <>
                         <Button
                           variant="danger"
@@ -454,7 +454,7 @@ const List = ({ type }) => {
                       </>
                     )}
                     {user.role === "student" &&
-                      (user.verified === 0 ? (
+                      (user.verified == 0 ? (
                         <Button
                           variant="info"
                           onClick={() => handleVerify("Verify Details", user)}
@@ -550,8 +550,8 @@ const List = ({ type }) => {
                     label="Accept"
                     name="verify"
                     type="radio"
-                    value="1"
-                    checked={userDetails.verified == 1}
+                    value="2"
+                    checked={userDetails.verified == 2}
                     onChange={handleChangeVerify}
                   />
                   <Form.Check
@@ -559,13 +559,13 @@ const List = ({ type }) => {
                     label="Reject"
                     name="verify"
                     type="radio"
-                    value="0"
-                    checked={userDetails.verified == 0}
+                    value="1"
+                    checked={userDetails.verified == 1}
                     onChange={handleChangeVerify}
                   />
                 </td>
                 <td className={style.cell}>
-                  {userDetails.verified == 0 && (
+                  {userDetails.verified == 1 && (
                     <Form.Control
                       type="text"
                       placeholder="Add Comments"
