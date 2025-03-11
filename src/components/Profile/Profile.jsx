@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Button, Container, Form, Row, Col } from "react-bootstrap";
+import { Button, Container, Form, Row, Col, Modal } from "react-bootstrap";
 import PropTypes from "prop-types";
 import style from "./Profile.module.css";
 import {
@@ -16,6 +16,8 @@ const Profile = () => {
   };
   const [error, setError] = useState("");
   const [scholarships, setScholarships] = useState([]);
+  const [showModel, setShowModel] = useState(false);
+  const handleCloseModal = () => setShowModel(false);
   const [userDetails, setUserDetails] = useState({
     name: "",
     mobileNo: "",
@@ -141,6 +143,7 @@ const Profile = () => {
     });
     console.log(response);
     setScholarships(response);
+    setShowModel(true);
   };
 
   return (
@@ -434,78 +437,6 @@ const Profile = () => {
             </Col>
             <Col>
               <div>
-                <label htmlFor="income">Income of the Family</label>
-                <br />
-                <Form.Select
-                  aria-label="Select income of the family"
-                  className={style.input}
-                  name="family_income"
-                  onChange={handleChange}
-                >
-                  <option value="">Family Income</option>
-                  <option
-                    selected={userDetails.family_income === "<1L"}
-                    value="<1L"
-                  >
-                    1 Lakh and below
-                  </option>
-                  <option
-                    selected={userDetails.family_income === "1L - 2.5L"}
-                    value="1L-2.5L"
-                  >
-                    1 Lakh to 2.5 Lakh
-                  </option>
-                  <option
-                    selected={userDetails.family_income === "2.5L - 8L"}
-                    value="2.5L-8L"
-                  >
-                    2.5 Lakh to 8 Lakh
-                  </option>
-                  <option
-                    selected={userDetails.family_income === ">8L"}
-                    value=">8L"
-                  >
-                    8 Lakh and above
-                  </option>
-                </Form.Select>
-              </div>
-            </Col>
-            <Col>
-              {userDetails.verified == 2 && (
-                <div>
-                  <label htmlFor="suggest">Suggest Scholarship:</label>
-                  <Button variety="primary" onClick={suggestScholarship}>
-                    Get Scholarships
-                  </Button>
-                  {scholarships.length > 0 && (
-                    <>
-                      <label htmlFor="scholarships">Scholarships:</label>
-                      <br />
-                      {scholarships.map((scholarship) => (
-                        <Form.Check
-                          key={scholarship}
-                          inline
-                          label={scholarship}
-                          name="verify"
-                          type="radio"
-                          value={scholarship}
-                        />
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
-            </Col>
-          </Row>
-          <br />
-          <Row>
-            <Col>{/* Add specially abled checkbox */}</Col>
-            <Col>{/* Add Income Dropdown */}</Col>
-            <Col></Col>
-          </Row>
-          <Row>
-            <Col>
-              <div>
                 <label htmlFor="status">Status</label>
                 <br />
                 {/* {userDetails.verified == 1 ? (
@@ -523,16 +454,69 @@ const Profile = () => {
                   <b style={{ color: "green" }}>Verified</b>
                 )}
               </div>
-            </Col>
-            {userDetails.verified == 0 && userDetails.comments && (
-              <Col>
+              {userDetails.verified == 0 && userDetails.comments && (
                 <div>
                   <label htmlFor="status">Comments:</label>
                   <br />
                   <b>{userDetails.comments}</b>
                 </div>
+              )}
+            </Col>
+            <Col>
+              <div>
+                <label htmlFor="income">Income of the Family</label>
+                <br />
+                <Form.Select
+                  aria-label="Select income of the family"
+                  className={style.input}
+                  name="family_income"
+                  onChange={handleChange}
+                >
+                  <option value="">Family Income</option>
+                  <option
+                    selected={userDetails.family_income === "<1L"}
+                    value="<1L"
+                  >
+                    1 Lakh and below
+                  </option>
+                  <option
+                    selected={userDetails.family_income === "1L-2.5L"}
+                    value="1L-2.5L"
+                  >
+                    1 Lakh to 2.5 Lakh
+                  </option>
+                  <option
+                    selected={userDetails.family_income === "2.5L-8L"}
+                    value="2.5L-8L"
+                  >
+                    2.5 Lakh to 8 Lakh
+                  </option>
+                  <option
+                    selected={userDetails.family_income === ">8L"}
+                    value=">8L"
+                  >
+                    8 Lakh and above
+                  </option>
+                </Form.Select>
+              </div>
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col>
+              <Col>
+                {userDetails.verified == 2 && (
+                  <div>
+                    <Button variety="primary" onClick={suggestScholarship}>
+                      Get Scholarships
+                    </Button>
+                  </div>
+                )}
               </Col>
-            )}
+            </Col>
+            <Col></Col>
+          </Row>
+          <Row>
             <Col></Col>
           </Row>
         </Container>
@@ -545,6 +529,17 @@ const Profile = () => {
           </div>
         )}
       </form>
+
+      <Modal size="lg" show={showModel} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>List of Scholarships</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {scholarships.map((scholarship) => (
+            <li key={scholarship}>{scholarship}</li>
+          ))}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
