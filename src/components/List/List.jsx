@@ -156,10 +156,13 @@ const List = ({ type }) => {
 
   const handleChangeComments = (e) => {
     const comments = e.target.value;
+    console.log(comments);
+
     setUserDetails((prevDetails) => ({
       ...prevDetails,
       comments: comments,
     }));
+    console.log(userDetails.comments);
   };
 
   const handleDelete = async (user) => {
@@ -238,14 +241,16 @@ const List = ({ type }) => {
       return false;
     }
 
-    if (userDetails.verified == 1) {
+    if (userDetails.verified == 2) {
       userDetails.comments = "";
     }
 
     if (
       action == "verify" &&
       userDetails.verified == 1 &&
-      userDetails.comments == ""
+      (userDetails.comments == "" ||
+        userDetails.comments == null ||
+        !userDetails.comments)
     ) {
       toast.error("Comments cannot be empty", {
         position: "top-center",
@@ -260,7 +265,22 @@ const List = ({ type }) => {
       });
       return false;
     }
-
+    // debugger;
+    console.log(
+      !userDetails.name,
+      !userDetails.email,
+      !userDetails.username,
+      !userDetails.mobileNo,
+      !userDetails.department,
+      !userDetails.year,
+      !userDetails.gpa,
+      !userDetails.aadhaar,
+      !userDetails.pan,
+      !userDetails.caste,
+      !userDetails.category,
+      !userDetails.gender,
+      userDetails.specially_abled == null || !userDetails.family_income
+    );
     if (
       !userDetails.name ||
       !userDetails.email ||
@@ -274,7 +294,7 @@ const List = ({ type }) => {
       !userDetails.caste ||
       !userDetails.category ||
       !userDetails.gender ||
-      !userDetails.specially_abled ||
+      userDetails.specially_abled == null ||
       !userDetails.family_income
     ) {
       if (userDetails.verified == 1) {
@@ -420,7 +440,7 @@ const List = ({ type }) => {
                       Delete
                     </Button>
                     {user.role === "student" &&
-                      (user.verified == 0 ? (
+                      (user.verified == 0 || user.verified == 1 ? (
                         <Button
                           variant="info"
                           onClick={() => handleVerify("Verify Details", user)}
