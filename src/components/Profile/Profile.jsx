@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button, Container, Form, Row, Col } from "react-bootstrap";
 import PropTypes from "prop-types";
 import style from "./Profile.module.css";
@@ -8,8 +8,12 @@ import {
   getUserDetails,
   updateUser,
 } from "../../services/auth.js";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 const Profile = () => {
+  const notify = (message) => {
+    return toast(message);
+  };
   const [error, setError] = useState("");
   const [scholarships, setScholarships] = useState([]);
   const [userDetails, setUserDetails] = useState({
@@ -103,7 +107,17 @@ const Profile = () => {
     if (response.status === false) {
       setError(response.message);
     } else {
-      alert("Profile updated successfully");
+      toast.success(`Profile updated successfully`, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
 
@@ -131,6 +145,19 @@ const Profile = () => {
 
   return (
     <div className={style.main}>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
       <h3>Profile</h3>
       {error && <p className="error">{error}</p>}
       <form id="studentRegister" onSubmit={updateProfile}>

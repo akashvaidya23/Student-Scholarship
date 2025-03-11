@@ -7,8 +7,6 @@ import {
   Container,
   Row,
   Col,
-  Badge,
-  FloatingLabel,
 } from "react-bootstrap";
 import style from "./List.module.css";
 import { getUsers } from "../../services/roles";
@@ -37,7 +35,6 @@ const List = ({ type }) => {
       console.log(err);
     }
   }, [user]);
-  const [toastColor, setToastColor] = useState("");
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -62,14 +59,11 @@ const List = ({ type }) => {
     specially_abled: "",
     family_income: "",
   });
-  const [params] = useSearchParams();
   const [error, setError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [panError, setPanError] = useState("");
   const [aadharError, setAadharError] = useState("");
   const [action, setAction] = useState("");
-
-  const achievementsRef = useRef();
 
   useEffect(() => {
     document.title = `List ${type.charAt(0).toUpperCase() + type.slice(1)}`;
@@ -139,23 +133,9 @@ const List = ({ type }) => {
     setPanError(isValidPAN(value) ? "" : "Invalid PAN number");
   };
 
-  const isValidAadhaar = (aadhaar) => /^[2-9]{1}[0-9]{11}$/.test(aadhaar);
+  const isValidAadhaar = (aadhaar) => /^[1-9]{1}[0-9]{11}$/.test(aadhaar);
 
   const isValidPAN = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
-
-  const addToList = (listName, ref) => {
-    if (ref.current?.value) {
-      const inputValue = ref.current.value;
-      setUserDetails((prevDetails) => ({
-        ...prevDetails,
-        achievements: [...(prevDetails.achievements || []), inputValue],
-      }));
-      ref.current.value = "";
-      ref.current.focus();
-    } else {
-      console.warn("Input is empty or ref is not defined.");
-    }
-  };
 
   const removeFromList = (listName, index) => {
     setUserDetails((prevDetails) => ({
@@ -167,7 +147,6 @@ const List = ({ type }) => {
   const [active, setActive] = useState("off");
   const handleChangeVerify = (e) => {
     const verify = e.target.value;
-    console.log(verify);
     verify == "1" ? setActive("not verified") : setActive(" verified");
     setUserDetails((prevDetails) => ({
       ...prevDetails,
@@ -265,7 +244,7 @@ const List = ({ type }) => {
 
     if (
       action == "verify" &&
-      userDetails.verified == 0 &&
+      userDetails.verified == 1 &&
       userDetails.comments == ""
     ) {
       toast.error("Comments cannot be empty", {
@@ -355,7 +334,7 @@ const List = ({ type }) => {
     try {
       let response = null;
       if (!userDetails.id) {
-        response = await registerUser(updatedPayload);
+        response = await registerUser(updatedPayload, false);
       } else {
         response = await updateUser(userDetails.id, updatedPayload);
       }
@@ -437,22 +416,9 @@ const List = ({ type }) => {
                       textAlign: "center",
                     }}
                   >
-                    {currentUser?.role === "admin" && user.verified != 2 && (
-                      <>
-                        <Button
-                          variant="danger"
-                          onClick={() => handleDelete(user)}
-                        >
-                          Delete
-                        </Button>
-                        <Button
-                          variant="primary"
-                          onClick={() => handleEdit("Edit", user)}
-                        >
-                          Edit
-                        </Button>
-                      </>
-                    )}
+                    <Button variant="danger" onClick={() => handleDelete(user)}>
+                      Delete
+                    </Button>
                     {user.role === "student" &&
                       (user.verified == 0 ? (
                         <Button
@@ -464,6 +430,16 @@ const List = ({ type }) => {
                       ) : (
                         <Button variant="success">Verified</Button>
                       ))}
+                    {currentUser?.role === "admin" && user.verified != 2 && (
+                      <>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleEdit("Edit", user)}
+                        >
+                          Edit
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -538,10 +514,6 @@ const List = ({ type }) => {
               <tr>
                 <th className={style.cell}>Family Income:</th>
                 <td className={style.cell}>{selectedUser.family_income}</td>
-              </tr>
-              <tr>
-                <th className={style.cell}>Achievements</th>
-                <td className={style.cell}>{selectedUser.achievements}</td>
               </tr>
               <tr>
                 <td className={style.cell}>
@@ -965,24 +937,7 @@ const List = ({ type }) => {
                           </Form.Select>
                         </div>
                       </Col>
-                      <Col>
-                        <div>
-                          <label htmlFor="achievements">Achievements</label>
-                          <br />
-                          <Form.Control
-                            type="text"
-                            placeholder="Achievements"
-                            name="achievements"
-                            id="achievements"
-                            onBlur={() =>
-                              addToList("achievements", achievementsRef)
-                            }
-                            className={style.input}
-                            autoComplete="off"
-                            ref={achievementsRef}
-                          />
-                        </div>
-                      </Col>
+                      <Col></Col>
                     </Row>
                     <br />
                     <Row>
